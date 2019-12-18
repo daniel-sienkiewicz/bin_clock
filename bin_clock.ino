@@ -1,7 +1,16 @@
+#include <TimeLib.h>
+#include <Wire.h>
+#include <DS1307RTC.h>
+
 int output[4][2];
 
 void setup() {  
   Serial.begin(9600);
+  setSyncProvider(RTC.get);   // the function to get the time from the RTC
+  if(timeStatus()!= timeSet) 
+     Serial.println("Unable to sync with the RTC");
+  else
+     Serial.println("RTC has set the system time");
 }
 
 void reset_output(){
@@ -67,6 +76,11 @@ void loop() {
   write_to_led(min);
   Serial.println("Min");
   print_output();
-
+  
+  if (timeStatus() == timeSet) {
+    Serial.print(hour());
+  } else {
+    Serial.println("The time has not been set.");
+  }
   delay(6000000);
 }
