@@ -1,58 +1,106 @@
-#include <TimeLib.h>
-#include <Wire.h>
-#include <DS1307RTC.h>
+/*
+bin_clock.ino - Arduino project for Real-Time Clock
 
-int output[4][2];
+Version: 1.0.0
+(c) 2019 Daaniel Sienkiewicz
+www.sienkiewicz.ovh
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the version 3 GNU General Public License as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include <Wire.h>
+#include "DS1307.h"
+
+DS1307 clock;
+RTCDateTime dt;
+int output[4][4];
 
 void setup() {  
   Serial.begin(9600);
-  setSyncProvider(RTC.get);   // the function to get the time from the RTC
-  if(timeStatus()!= timeSet) 
-     Serial.println("Unable to sync with the RTC");
-  else
-     Serial.println("RTC has set the system time");
+
+  // Initialize DS1307
+  Serial.println("Initialize DS1307");;
+  clock.begin();
+
+  // If date not set
+  if (!clock.isReady())
+  {
+    // Set sketch compiling time
+    clock.setDateTime(__DATE__, __TIME__);
+  }
 }
 
 void reset_output(){
   int i, j;
 
   for (i = 0; i < 4; i++)
-    for (j = 0; j < 2; j++)
+    for (j = 0; j < 4; j++)
       output[i][j] = 0;
 }
 
 void print_output(){
-  int i;
+  int i, j;
 
     for (i = 3; i >=0; i--){
-      Serial.print(output[i][0]);
-      Serial.println(output[i][1]);
+      for (j = 0; j < 4; j++)
+        Serial.print(output[i][j]);
+      Serial.println();
     }
     Serial.println();
 }
 
-void get_time(int *month, int *day, int *h, int *min) {
-  *month = 5;
-  *day = 10;
-  *h = 35;
-  *min = 4;
-}
-
-void write_to_led(int value){
+void write_to_led_min(int value){
   int dec, part;
   dec = value / 10;
   part = value % 10;
 
-  if (dec == 1 || dec == 3)
+  if (dec == 1 || dec == 3 || dec == 5 || dec == 7|| dec == 9)
+    output[0][2] = 1;
+
+  if (dec == 2 || dec == 3 || dec == 6 || dec == 7)
+    output[1][2] = 1;
+
+  if (dec == 4 || dec == 5)
+    output[2][2] = 1;
+
+  if (part == 1 || part == 3 || part == 5 || part == 7|| part == 9)
+    output[0][3] = 1;
+ 
+  if (part == 2 || part == 3 || part == 6|| part == 7)
+    output[1][3] = 1;
+
+  if (part == 4  || part == 5|| part == 6|| part == 7)
+    output[2][3] = 1;
+
+  if (part == 8 || part == 9)
+    output[3][3] = 1;
+}
+
+void write_to_led_h(int value){
+  int dec, part;
+  dec = value / 10;
+  part = value % 10;
+
+  if (dec == 1)
     output[0][0] = 1;
  
-  if (dec == 2 || dec == 3)
+  if (dec == 2)
     output[1][0] = 1;
 
   if (part == 1 || part == 3 || part == 5 || part == 7|| part == 9)
     output[0][1] = 1;
  
-  if (part == 2 || part == 3|| part == 6|| part == 7)
+  if (part == 2 || part == 3 || part == 6|| part == 7)
     output[1][1] = 1;
 
   if (part == 4  || part == 5|| part == 6|| part == 7)
@@ -60,27 +108,26 @@ void write_to_led(int value){
 
   if (part == 8 || part == 9)
     output[3][1] = 1;
- 
+}
+
+void print_time(){
+  Serial.print("Raw data: ");
+  Serial.print(dt.year);   Serial.print("-");
+  Serial.print(dt.month);  Serial.print("-");
+  Serial.print(dt.day);    Serial.print(" ");
+  Serial.print(dt.hour);   Serial.print(":");
+  Serial.print(dt.minute); Serial.print(":");
+  Serial.print(dt.second); Serial.println("");
 }
 
 void loop() {
   int min, h, day, month;
-  get_time(&month, &day, &h, &min);
 
-  write_to_led(h);
-  Serial.println("Hours");
+  dt = clock.getDateTime();
+  print_time();
+  write_to_led_h(dt.hour);
+  write_to_led_min(dt.minute);
   print_output();
-
   reset_output();
-  
-  write_to_led(min);
-  Serial.println("Min");
-  print_output();
-  
-  if (timeStatus() == timeSet) {
-    Serial.print(hour());
-  } else {
-    Serial.println("The time has not been set.");
-  }
-  delay(6000000);
+  delay(6000);
 }
