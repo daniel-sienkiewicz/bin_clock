@@ -25,7 +25,9 @@ DS1307 clock;
 RTCDateTime dt;
 int output[4][4];
 
-void setup() {  
+void setup() {
+  int pin;
+
   Serial.begin(9600);
 
   // Initialize DS1307
@@ -38,6 +40,9 @@ void setup() {
     // Set sketch compiling time
     clock.setDateTime(__DATE__, __TIME__);
   }
+
+  for(pin = 2; pin < 14; pin++)
+    pinMode(pin, OUTPUT);
 }
 
 void reset_output(){
@@ -46,6 +51,9 @@ void reset_output(){
   for (i = 0; i < 4; i++)
     for (j = 0; j < 4; j++)
       output[i][j] = 0;
+
+  for(i = 2; i < 14; i++)
+    digitalWrite(i, LOW);
 }
 
 void print_output(){
@@ -64,26 +72,40 @@ void write_to_led_min(int value){
   dec = value / 10;
   part = value % 10;
 
-  if (dec == 1 || dec == 3 || dec == 5 || dec == 7|| dec == 9)
+  if (dec == 1 || dec == 3 || dec == 5 || dec == 7|| dec == 9){
     output[0][2] = 1;
+    digitalWrite(7, HIGH);
+  }
 
-  if (dec == 2 || dec == 3 || dec == 6 || dec == 7)
+  if (dec == 2 || dec == 3 || dec == 6 || dec == 7){
     output[1][2] = 1;
+    digitalWrite(8, HIGH);
+  }
 
-  if (dec == 4 || dec == 5)
+  if (dec == 4 || dec == 5){
     output[2][2] = 1;
-
-  if (part == 1 || part == 3 || part == 5 || part == 7|| part == 9)
+    digitalWrite(9, HIGH);
+  }
+  
+  if (part == 1 || part == 3 || part == 5 || part == 7|| part == 9){
     output[0][3] = 1;
- 
-  if (part == 2 || part == 3 || part == 6|| part == 7)
+    digitalWrite(10, HIGH);
+  }
+  
+  if (part == 2 || part == 3 || part == 6|| part == 7){
     output[1][3] = 1;
-
-  if (part == 4  || part == 5|| part == 6|| part == 7)
+    digitalWrite(11, HIGH);
+  }
+  
+  if (part == 4  || part == 5|| part == 6|| part == 7){
     output[2][3] = 1;
-
-  if (part == 8 || part == 9)
+    digitalWrite(12, HIGH);
+  }
+  
+  if (part == 8 || part == 9){
     output[3][3] = 1;
+    digitalWrite(13, HIGH);
+  }
 }
 
 void write_to_led_h(int value){
@@ -91,23 +113,35 @@ void write_to_led_h(int value){
   dec = value / 10;
   part = value % 10;
 
-  if (dec == 1)
+  if (dec == 1){
     output[0][0] = 1;
+    digitalWrite(2, HIGH);
+  }
  
-  if (dec == 2)
+  if (dec == 2){
     output[1][0] = 1;
-
-  if (part == 1 || part == 3 || part == 5 || part == 7|| part == 9)
+    digitalWrite(3, HIGH);
+  }
+  
+  if (part == 1 || part == 3 || part == 5 || part == 7|| part == 9){
     output[0][1] = 1;
- 
-  if (part == 2 || part == 3 || part == 6|| part == 7)
+     digitalWrite(4, HIGH);
+  }
+  
+  if (part == 2 || part == 3 || part == 6|| part == 7){
     output[1][1] = 1;
-
-  if (part == 4  || part == 5|| part == 6|| part == 7)
+    digitalWrite(5, HIGH);
+  }
+  
+  if (part == 4  || part == 5|| part == 6|| part == 7){
     output[2][1] = 1;
-
-  if (part == 8 || part == 9)
+    digitalWrite(6, HIGH);
+  }
+  
+  if (part == 8 || part == 9){
     output[3][1] = 1;
+    digitalWrite(6, HIGH);
+  }
 }
 
 void print_time(){
@@ -121,13 +155,11 @@ void print_time(){
 }
 
 void loop() {
-  int min, h, day, month;
-
   dt = clock.getDateTime();
   print_time();
   write_to_led_h(dt.hour);
   write_to_led_min(dt.minute);
   print_output();
-  reset_output();
   delay(6000);
+  reset_output();
 }
