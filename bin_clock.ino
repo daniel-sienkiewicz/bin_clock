@@ -35,11 +35,11 @@ void setup() {
   clock.begin();
 
   // If date not set
-  if (!clock.isReady())
-  {
+  //if (!clock.isReady())
+  //{
     // Set sketch compiling time
     clock.setDateTime(__DATE__, __TIME__);
-  }
+  //}
 
   for(pin = 2; pin < 14; pin++)
     pinMode(pin, OUTPUT);
@@ -54,6 +54,8 @@ void reset_output(){
 
   for(i = 2; i < 14; i++)
     digitalWrite(i, LOW);
+
+  analogWrite(A2, 0);
 }
 
 void print_output(){
@@ -115,27 +117,27 @@ void write_to_led_h(int value){
 
   if (dec == 1){
     output[0][0] = 1;
-    digitalWrite(2, HIGH);
+    analogWrite(A2, 255);
   }
  
   if (dec == 2){
     output[1][0] = 1;
-    digitalWrite(3, HIGH);
+    digitalWrite(2, HIGH);
   }
   
   if (part == 1 || part == 3 || part == 5 || part == 7|| part == 9){
     output[0][1] = 1;
-     digitalWrite(4, HIGH);
+     digitalWrite(3, HIGH);
   }
   
   if (part == 2 || part == 3 || part == 6|| part == 7){
     output[1][1] = 1;
-    digitalWrite(5, HIGH);
+    digitalWrite(4, HIGH);
   }
   
   if (part == 4  || part == 5|| part == 6|| part == 7){
     output[2][1] = 1;
-    digitalWrite(6, HIGH);
+    digitalWrite(5, HIGH);
   }
   
   if (part == 8 || part == 9){
