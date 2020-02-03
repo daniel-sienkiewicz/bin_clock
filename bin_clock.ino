@@ -2,7 +2,7 @@
 bin_clock.ino - Arduino project for Real-Time Clock
 
 Version: 1.0.0
-(c) 2019 Daaniel Sienkiewicz
+(c) 2019 Daniel Sienkiewicz
 www.sienkiewicz.ovh
 
 This program is free software: you can redistribute it and/or modify
